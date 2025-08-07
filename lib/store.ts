@@ -6,6 +6,11 @@ export type SearchResult = {
   url: string;
 };
 
+export type StoredLibrary = {
+  title: string;
+  url: string;
+};
+
 export type SearchStore = {
   searchResults: SearchResult[];
   setSearchResults: (results: SearchResult[]) => void;
@@ -14,6 +19,8 @@ export type SearchStore = {
   setIsLoading: (loading: boolean) => void;
   expectedCount: number;
   setExpectedCount: (count: number) => void;
+  storedLibrary: StoredLibrary[];
+  setStoredLibrary: (newItems: StoredLibrary[]) => void;
 };
 
 export const useSearchStore = create<SearchStore>((set) => ({
@@ -24,4 +31,15 @@ export const useSearchStore = create<SearchStore>((set) => ({
   setIsLoading: (loading: boolean) => set({ isLoading: loading }),
   expectedCount: 0,
   setExpectedCount: (count) => set({ expectedCount: count }),
+  storedLibrary: [],
+  setStoredLibrary: (newItems) =>
+    set((state) => ({
+      storedLibrary: [
+        ...state.storedLibrary,
+        ...newItems.filter(
+          (item) =>
+            !state.storedLibrary.some((existing) => existing.url === item.url)
+        ),
+      ],
+    })),
 }));

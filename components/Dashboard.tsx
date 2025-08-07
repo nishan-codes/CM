@@ -1,6 +1,13 @@
 import { ChartAreaInteractive } from "@/components/Chart";
 import { TableDemo } from "@/components/Table";
-import { Eye, MousePointerClick, TrendingDown, TrendingUp, UserRoundCheck, Users } from "lucide-react";
+import {
+  Eye,
+  MousePointerClick,
+  TrendingDown,
+  TrendingUp,
+  UserRoundCheck,
+  Users,
+} from "lucide-react";
 
 const Dashboard = () => {
   return (
@@ -11,32 +18,32 @@ const Dashboard = () => {
       {/* 1st section  */}
 
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mt-4">
-        <Card 
+        <Card
           title="Views"
           count="40,689"
           difference={8.5}
-          icon={<Users fill="black"/>}
+          icon={<Users fill="black" />}
           className={"bg-blue-100"}
         />
-        <Card 
+        <Card
           title="CTR"
           count="102,983"
           difference={1.3}
-          icon={<MousePointerClick fill="black"/>}
+          icon={<MousePointerClick fill="black" />}
           className={"bg-yellow-100"}
         />
-        <Card 
+        <Card
           title="Avg View Duration"
           count="89,000"
           difference={-4.3}
-          icon={<Eye/>}
+          icon={<Eye />}
           className={"bg-green-100"}
         />
-        <Card 
+        <Card
           title="Sub Rate"
           count="2040"
           difference={1.8}
-          icon={<UserRoundCheck/>}
+          icon={<UserRoundCheck />}
           className={"bg-red-100"}
         />
       </div>
@@ -52,13 +59,12 @@ const Dashboard = () => {
       <div className="my-4 p-4 border border-border bg-card rounded-lg shadow-sm">
         <h2 className="text-md sm:text-lg lg:text-xl font-semibold mb-4">
           Top Performing Videos
-          </h2>
+        </h2>
         <TableDemo />
       </div>
-
     </div>
-  )
-}
+  );
+};
 
 type CardProps = {
   title: string;
@@ -76,9 +82,7 @@ const Card = ({ title, count, difference, icon, className }: CardProps) => {
           <h2 className="text-md">{title}</h2>
           <p className="text-lg font-semibold">{count}</p>
         </div>
-        <div className={`${className} rounded-full p-3`}>
-          {icon}
-        </div>
+        <div className={`${className} rounded-full p-3`}>{icon}</div>
       </div>
       <div className="flex items-center gap-1 mt-2">
         <p
@@ -87,20 +91,19 @@ const Card = ({ title, count, difference, icon, className }: CardProps) => {
           }`}
         >
           {difference > 0 ? (
-            <TrendingUp width={15} height={15}/>
+            <TrendingUp width={15} height={15} />
           ) : (
-            <TrendingDown width={15} height={15}/>
+            <TrendingDown width={15} height={15} />
           )}
           {difference > 0 ? "+" : ""}
-          {difference}%
-          {" "}
+          {difference}%{" "}
         </p>
-          <p className="text-sm">
-            {difference > 0 ? "Up from yesterday" : "Down from yesterday"}
-          </p>
+        <p className="text-sm">
+          {difference > 0 ? "Up from yesterday" : "Down from yesterday"}
+        </p>
       </div>
     </div>
   );
 };
 
-export default Dashboard
+export default Dashboard;

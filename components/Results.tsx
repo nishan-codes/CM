@@ -9,11 +9,12 @@ import {
 import { FlipReveal, FlipRevealItem } from "@/components/ui/flip-reveal";
 import { Button } from "./ui/button";
 import { AnimatePresence, motion } from "framer-motion";
-import { Check, ChevronDown } from "lucide-react";
+import { Check, ChevronDown, SquareCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { useSearchStore } from "@/lib/store";
 import { Skeleton } from "./ui/skeleton";
+import Image from "next/image";
 
 // const items = [
 //   {
@@ -34,8 +35,14 @@ import { Skeleton } from "./ui/skeleton";
 // ];
 
 export const Demo = () => {
-  const { searchResults, isLoading, setIsLoading, expectedCount } =
-    useSearchStore();
+  const {
+    searchResults,
+    isLoading,
+    setIsLoading,
+    expectedCount,
+    storedLibrary,
+    setStoredLibrary,
+  } = useSearchStore();
 
   const items = searchResults
     ? searchResults.map((result) => ({
@@ -63,6 +70,21 @@ export const Demo = () => {
       setLibrary((prev) => [...prev, src]);
     }
   };
+
+  const saveToLibrary = () => {
+    const selectedItems = searchResults
+      .filter((item) => library.includes(item.url))
+      .map((item) => ({
+        title: item.title,
+        url: item.url,
+      }));
+
+    setStoredLibrary(selectedItems);
+  };
+
+  useEffect(() => {
+    console.log("Updated storedLibrary:", storedLibrary);
+  }, [storedLibrary]);
 
   return (
     <div className="flex min-h-120 flex-col items-start gap-8">
@@ -135,7 +157,10 @@ export const Demo = () => {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => toast("Successfully added to library!")}
+            onClick={() => {
+              saveToLibrary();
+              toast("Successfully added to library!");
+            }}
           >
             Add to library
           </Button>
@@ -150,35 +175,34 @@ export const Demo = () => {
         showClass="flex"
         hideClass="hidden"
       >
-        {isLoading ? (
-          Array.from({ length: expectedCount || 6 }).map((_, index) => (
-            <div key={index}>
-              <Skeleton className="w-full aspect-square rounded-md" />
-            </div>
-          ))
-        ) : items.length > 0 ? (
-          items.map((item, index) => (
-            <FlipRevealItem
-              className="overflow-hidden rounded-md"
-              key={index}
-              flipKey={item.key}
-            >
-              <img
-                src={item.src}
-                alt={item.title}
-                className={`object-cover hover:scale-110 cursor-pointer w-full aspect-square rounded-md hover:brightness-50 transition-all ease-in
+        {isLoading
+          ? Array.from({ length: expectedCount || 6 }).map((_, index) => (
+              <div key={index}>
+                <Skeleton className="w-full aspect-square rounded-md" />
+              </div>
+            ))
+          : items.length > 0 &&
+            items.map((item, index) => (
+              <FlipRevealItem
+                className="relative aspect-square overflow-hidden rounded-md shadow-2xl"
+                key={index}
+                flipKey={item.key}
+              >
+                <Image
+                  src={item.src}
+                  alt={item.title}
+                  fill
+                  className={`object-cover hover:scale-105 cursor-pointer w-full aspect-square rounded-md transition-all ease-in
                 ${library.includes(item.src) ? "brightness-50" : ""}`}
-                onClick={() => addToLibrary(item.src)}
-              />
-            </FlipRevealItem>
-          ))
-        ) : (
-          <div className="w-[85%] mx-auto fixed">
-            <p className="text-center font-semibold bg-gradient-to-r from-pink-500 to-rose-500 bg-clip-text text-transparent">
-              Search Smth..
-            </p>
-          </div>
-        )}
+                  onClick={() => addToLibrary(item.src)}
+                />
+                {library.includes(item.src) && (
+                  <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+                    <SquareCheck size={50} stroke="white" />
+                  </div>
+                )}
+              </FlipRevealItem>
+            ))}
       </FlipReveal>
     </div>
   );

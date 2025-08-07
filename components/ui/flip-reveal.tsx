@@ -50,7 +50,7 @@ export const FlipReveal = ({ keys, hideClass = "", showClass = "", ...props }: F
                 scale: true,
                 ease: "power1.inOut",
                 stagger: 0.05,
-                absolute: true,
+                absolute: false,
                 onEnter: (elements) =>
                     gsap.fromTo(
                         elements,

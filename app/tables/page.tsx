@@ -15,60 +15,21 @@ import {
 } from "@/components/ui/table";
 import { useSearchStore } from "@/lib/store";
 
-const invoices = [
-  {
-    invoice: "INV001",
-    paymentStatus: "Paid",
-    totalAmount: "$250.00",
-    paymentMethod: "Credit Card",
-  },
-  {
-    invoice: "INV002",
-    paymentStatus: "Pending",
-    totalAmount: "$150.00",
-    paymentMethod: "PayPal",
-  },
-  {
-    invoice: "INV003",
-    paymentStatus: "Unpaid",
-    totalAmount: "$350.00",
-    paymentMethod: "Bank Transfer",
-  },
-  {
-    invoice: "INV004",
-    paymentStatus: "Paid",
-    totalAmount: "$450.00",
-    paymentMethod: "Credit Card",
-  },
-  {
-    invoice: "INV005",
-    paymentStatus: "Paid",
-    totalAmount: "$550.00",
-    paymentMethod: "PayPal",
-  },
-  {
-    invoice: "INV006",
-    paymentStatus: "Pending",
-    totalAmount: "$200.00",
-    paymentMethod: "Bank Transfer",
-  },
-  {
-    invoice: "INV007",
-    paymentStatus: "Unpaid",
-    totalAmount: "$300.00",
-    paymentMethod: "Credit Card",
-  },
-];
-
 const Page = () => {
   const { storedLibrary } = useSearchStore();
 
   return (
-    <div className="flex flex-1 flex-col gap-5 pt-14 md:pt-19 pb-5 px-5 sm:px-6 lg:px-8">
+    <div
+      className={`flex flex-1 flex-col gap-5 pt-14 md:pt-19 pb-5 px-5 sm:px-6 lg:px-8`}
+    >
       <div className="flex gap-3 items-center justify-between">
         <h1 className="text-md sm:text-xl lg:text-3xl bg-gradient-to-r from-cyan-500 to-blue-500 bg-clip-text text-transparent">
           <GradientText
-            colors={["oklch(71.5% 0.143 215.221)", "oklch(62.3% 0.214 259.815)", "#000"]}
+            colors={[
+              "oklch(71.5% 0.143 215.221)",
+              "oklch(62.3% 0.214 259.815)",
+              "#000",
+            ]}
             animationSpeed={5}
             className="font-semibold"
           >
@@ -81,6 +42,7 @@ const Page = () => {
           onClick={() => {
             exportToExcel(storedLibrary);
           }}
+          className={storedLibrary.length > 0 ? "" : "hidden"}
         >
           Export to excel
         </Button>

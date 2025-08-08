@@ -16,24 +16,6 @@ import { useSearchStore } from "@/lib/store";
 import { Skeleton } from "./ui/skeleton";
 import Image from "next/image";
 
-// const items = [
-//   {
-//     key: "shirt",
-//     src: "https://upload.wikimedia.org/wikipedia/commons/4/4a/OzzyChangingHands02-20-2010.jpg",
-//     alt: "Shirt",
-//   },
-//   {
-//     key: "goggles",
-//     src: "https://images.unsplash.com/photo-1648688135643-2716ec8f4b24?q=80&w=300",
-//     alt: "Goggles",
-//   },
-//   {
-//     key: "shoes",
-//     src: "https://images.unsplash.com/photo-1631984564919-1f6b2313a71c?q=80&w=300",
-//     alt: "Shoes",
-//   },
-// ];
-
 export const Demo = () => {
   const {
     searchResults,
@@ -47,11 +29,13 @@ export const Demo = () => {
   const items = searchResults
     ? searchResults.map((result) => ({
         src: result.url,
+        thumbnail: result.thumbnail,
         title: result.title,
         key: result.title,
       }))
     : [];
 
+  const isYoutube = searchResults && items.length > 0 && items[0].src.includes("youtube");
   // console.log(items);
 
   useEffect(() => {
@@ -189,7 +173,7 @@ export const Demo = () => {
                 flipKey={item.key}
               >
                 <Image
-                  src={item.src}
+                  src={isYoutube ? item.thumbnail : item.src}
                   alt={item.title}
                   fill
                   className={`object-cover hover:scale-105 cursor-pointer w-full aspect-square rounded-md transition-all ease-in

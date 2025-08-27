@@ -171,8 +171,9 @@ export const SidebarLink = ({
     <Link
       href={link.href}
       className={cn(
-        "flex hover:text-blue-500 items-center justify-start gap-2 group/sidebar py-2",
-        pathname === link.href ? "text-blue-500" : "text-neutral-700" , className
+        "flex transition-all duration-300 hover:bg-blue-300/10 rounded-sm items-center justify-start gap-2 group/sidebar py-2",
+        pathname === link.href ? "text-blue-500" : "text-white" , className,
+        open ? 'pl-2' : ''
       )}
       {...props}
       onClick={() => setOpen(!open)}
@@ -186,7 +187,7 @@ export const SidebarLink = ({
         }}
         className={
           cn(
-            "text-neutral-700 hover:text-blue-500 dark:text-neutral-200 text-sm group-hover/sidebar:translate-x-1 transition duration-150 whitespace-pre inline-block !p-0 !m-0"
+            "text-neutral-700  hover:text-blue-500 dark:text-neutral-200 text-sm group-hover/sidebar:translate-x-1 transition duration-150 whitespace-pre inline-block !p-0 !m-0"
           , pathname === link.href ? "text-blue-500" : "text-neutral-700")
         }
       >

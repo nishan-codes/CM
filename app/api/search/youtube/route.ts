@@ -56,10 +56,11 @@ export async function POST(req: NextRequest) {
     if (
       !Array.isArray(terms) ||
       terms.length === 0 ||
-      typeof resultsPerTerm !== "number"
+      typeof resultsPerTerm !== "number" ||
+      !terms.every((term) => typeof term === "string" && term.trim().length > 0)
     ) {
       return NextResponse.json(
-        { error: "Invalid request body" },
+        { error: "Invalid request body. Terms must be non-empty strings." },
         { status: 400 }
       );
     }

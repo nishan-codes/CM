@@ -12,8 +12,8 @@ const Toaster = ({ ...props }: ToasterProps) => {
       className="toaster group"
       style={
         {
-          "--normal-bg": "#b9f8cf",
-          "--normal-text": "var(--popover-foreground)",
+          "--normal-bg": "#7bf1a8",
+          "--normal-text": "oklch(62.7% 0.194 149.214)",
           "--normal-border": "var(--border)",
         } as React.CSSProperties
       }

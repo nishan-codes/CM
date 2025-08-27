@@ -35,12 +35,12 @@ export const Demo = () => {
       }))
     : [];
 
-  const isYoutube = searchResults && items.length > 0 && items[0].src.includes("youtube");
-  // console.log(items);
+  const isYoutube =
+    searchResults && items.length > 0 && items[0]?.src?.includes("youtube");
 
   useEffect(() => {
     setIsLoading(false);
-  }, [searchResults]);
+  }, [searchResults, setIsLoading]);
 
   const [key, setKey] = useState("all");
   const [library, setLibrary] = useState<string[]>([]);
@@ -67,7 +67,7 @@ export const Demo = () => {
   };
 
   useEffect(() => {
-    console.log("Updated storedLibrary:", storedLibrary);
+    // Library updated successfully
   }, [storedLibrary]);
 
   return (

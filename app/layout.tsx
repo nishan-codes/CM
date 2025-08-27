@@ -4,6 +4,7 @@ import "./globals.css";
 import { SidebarDemo } from "@/components/Sidebar";
 import Navbar from "@/components/Navbar";
 import { Toaster } from "@/components/ui/sonner";
+import { ThemeProvider } from "@/components/theme-provider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -18,7 +19,7 @@ const geistMono = Geist_Mono({
 const inter = Inter({
   variable: "--font-inter",
   subsets: ["latin"],
-})
+});
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -35,14 +36,21 @@ export default function RootLayout({
       <body
         className={`${inter.variable} ${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <div className="relative h-screen w-full overflow-hidden">
-          <div className="flex h-full">
-            <Navbar />
-            <SidebarDemo />
-            <main className="flex-1 overflow-x-hidden">{children}</main>
-            <Toaster />
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <div className="relative h-screen w-full overflow-hidden">
+            <div className="flex h-full">
+              <Navbar />
+              <SidebarDemo />
+              <main className="flex-1 overflow-x-hidden">{children}</main>
+              <Toaster />
+            </div>
           </div>
-        </div>
+        </ThemeProvider>
       </body>
     </html>
   );

@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import pLimit from "p-limit";
+import { deduplicateImages, isValidImageUrl } from "@/lib/image-utils";
 
-const API_KEY = process.env.GOOGLE_SEARCH_API_KEY;
-const SEARCH_ENGINE_ID = process.env.GOOGLE_SEARCH_ENGINE_ID;
+const API_KEY = process.env.GOOGLE_SEARCH_API_KEY!;
+const SEARCH_ENGINE_ID = process.env.GOOGLE_SEARCH_ENGINE_ID!;
 const PER_CALL = 10;
 
 const limit = pLimit(5);
@@ -24,7 +25,7 @@ const fetchImagesForTerm = async (term: string, resultsPerTerm: number) => {
 
   for (let i = 0; i < callsNeeded; i++) {
     const start = i * PER_CALL + 1;
-    const actualNum = Math.min(PER_CALL, resultsPerTerm - (i * PER_CALL));
+    const actualNum = Math.min(PER_CALL, resultsPerTerm - i * PER_CALL);
 
     const res = await fetch(
       `https://www.googleapis.com/customsearch/v1?key=${API_KEY}&cx=${SEARCH_ENGINE_ID}` +
@@ -41,11 +42,19 @@ const fetchImagesForTerm = async (term: string, resultsPerTerm: number) => {
     if (data.items) allItems.push(...data.items);
   }
 
-  return allItems.map((item: GoogleImageItem) => ({
-    title: item.title,
-    thumbnail: item.image?.thumbnailLink || item.link,
-    url: item.link,
-  }));
+  // Map items and only filter out known problematic domains
+  const mappedItems = allItems
+    .map((item: GoogleImageItem) => ({
+      title: item.title,
+      thumbnail: item.image?.thumbnailLink || item.link,
+      url: item.link,
+    }))
+    .filter((item) => {
+      // Only filter out known social media redirects
+      return isValidImageUrl(item.url);
+    });
+
+  return mappedItems;
 };
 
 export async function POST(req: NextRequest) {
@@ -56,10 +65,11 @@ export async function POST(req: NextRequest) {
     if (
       !Array.isArray(terms) ||
       terms.length === 0 ||
-      typeof resultsPerTerm !== "number"
+      typeof resultsPerTerm !== "number" ||
+      !terms.every((term) => typeof term === "string" && term.trim().length > 0)
     ) {
       return NextResponse.json(
-        { error: "Invalid request body" },
+        { error: "Invalid request body. Terms must be non-empty strings." },
         { status: 400 }
       );
     }
@@ -70,11 +80,33 @@ export async function POST(req: NextRequest) {
 
     const allResults = (await Promise.all(tasks)).flat();
 
-    console.log(allResults)
+    // Only deduplicate - no aggressive filtering
+    const deduplicatedResults = deduplicateImages(allResults);
 
-    return NextResponse.json({ results: allResults, totalResults: allResults.length }, { status: 200 });
+    // Only filter out obvious spam/error cases
+    const filteredResults = deduplicatedResults.filter((result) => {
+      // Keep results with any meaningful title
+      if (!result.title || result.title.trim().length < 2) return false;
+
+      // Only filter out obvious error cases
+      const title = result.title.toLowerCase();
+      if (title === "error" || title === "404" || title === "not found") {
+        return false;
+      }
+
+      return true;
+    });
+
+    console.log(
+      `Original: ${allResults.length}, After deduplication: ${deduplicatedResults.length}, After filtering: ${filteredResults.length}`
+    );
+
+    return NextResponse.json(
+      { results: filteredResults, totalResults: filteredResults.length },
+      { status: 200 }
+    );
   } catch (err: unknown) {
-    const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+    const errorMessage = err instanceof Error ? err.message : "Unknown error";
 
     console.error("error in /api/google-images", errorMessage);
     return NextResponse.json(

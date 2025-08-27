@@ -4,6 +4,7 @@ export type SearchResult = {
   title: string;
   thumbnail: string;
   url: string;
+  searchTerm?: string; // Optional for backward compatibility
 };
 
 export type StoredLibrary = {
@@ -21,6 +22,8 @@ export type SearchStore = {
   setExpectedCount: (count: number) => void;
   storedLibrary: StoredLibrary[];
   setStoredLibrary: (newItems: StoredLibrary[]) => void;
+  searchTerms: string[];
+  setSearchTerms: (terms: string[]) => void;
 };
 
 export const useSearchStore = create<SearchStore>((set) => ({
@@ -42,4 +45,6 @@ export const useSearchStore = create<SearchStore>((set) => ({
         ),
       ],
     })),
+  searchTerms: [],
+  setSearchTerms: (terms) => set({ searchTerms: terms }),
 }));

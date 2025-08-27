@@ -134,17 +134,17 @@ export default function AI_Prompt() {
         }),
       });
 
-      const data = await res.json();
-
-      console.log("This is the data: ", data.results);
-
-      setSearchResults(data.results);
-
       if (!res.ok) {
-        throw new Error("Unknown error occurred");
+        throw new Error(`API request failed with status ${res.status}`);
       }
+
+      const data = await res.json();
+      setSearchResults(data.results);
     } catch (error) {
       console.error("Error message: ", error);
+      setIsLoading(false);
+    } finally {
+      setIsLoading(false);
     }
   };
 

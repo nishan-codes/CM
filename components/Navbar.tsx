@@ -2,6 +2,7 @@ import { Bell, BellDot } from "lucide-react";
 import React from "react";
 import { ThemeToggle } from "./theme-toggle";
 import Image from "next/image";
+import TokensBadge from "./TokensBadge";
 
 const Navbar = () => {
   return (
@@ -20,6 +21,7 @@ const Navbar = () => {
               </div>
             </div>
             <div className="flex items-center space-x-4">
+              <TokensBadge />
               <ThemeToggle />
               <Bell className="text-muted-foreground hover:text-foreground cursor-pointer transition-colors" />
               <BellDot

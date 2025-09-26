@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import pLimit from "p-limit";
 import { deduplicateImages, isValidImageUrl } from "@/lib/image-utils";
+import { calculateSearchCost, consumeTokens, getUidFromCookie } from "@/lib/tokens";
 
 const API_KEY = process.env.GOOGLE_SEARCH_API_KEY!;
 const SEARCH_ENGINE_ID = process.env.GOOGLE_SEARCH_ENGINE_ID!;
@@ -74,6 +75,17 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Token check & consume before making external calls
+    const uid = await getUidFromCookie();
+    const cost = calculateSearchCost(terms, resultsPerTerm);
+    const consumed = await consumeTokens(uid, cost);
+    if (!consumed.ok) {
+      return NextResponse.json(
+        { error: "INSUFFICIENT_TOKENS", needed: cost, balance: consumed.balance },
+        { status: 402 }
+      );
+    }
+
     const tasks = terms.map((term: string) =>
       limit(() => fetchImagesForTerm(term, resultsPerTerm))
     );
@@ -102,7 +114,7 @@ export async function POST(req: NextRequest) {
     );
 
     return NextResponse.json(
-      { results: filteredResults, totalResults: filteredResults.length },
+      { results: filteredResults, totalResults: filteredResults.length, charged: cost },
       { status: 200 }
     );
   } catch (err: unknown) {

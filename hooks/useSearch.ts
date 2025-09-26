@@ -34,6 +34,13 @@ const searchAPI = async ({
     );
   }
 
+  // If insufficient tokens, propagate error with status 402
+  if (res.status === 402) {
+    const e = await res.json();
+    const error = new Error(`402: ${e?.error || "INSUFFICIENT_TOKENS"}`);
+    throw error;
+  }
+
   return res.json();
 };
 

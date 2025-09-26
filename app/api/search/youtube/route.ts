@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import pLimit from "p-limit";
+import { calculateSearchCost, consumeTokens, getUidFromCookie } from "@/lib/tokens";
 
 const limit = pLimit(5);
 const MAX_RESULTS_PER_CALL = 50;
@@ -65,6 +66,17 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Token check & consume before making external calls
+    const uid = await getUidFromCookie();
+    const cost = calculateSearchCost(terms, resultsPerTerm);
+    const consumed = await consumeTokens(uid, cost);
+    if (!consumed.ok) {
+      return NextResponse.json(
+        { error: "INSUFFICIENT_TOKENS", needed: cost, balance: consumed.balance },
+        { status: 402 }
+      );
+    }
+
     const tasks = terms.map((term) =>
       limit(() => fetchVideosForTerm(term, resultsPerTerm))
     );
@@ -75,6 +87,7 @@ export async function POST(req: NextRequest) {
       {
         results: allResults,
         totalResults: allResults.length,
+        charged: cost,
       },
       { status: 200 }
     );

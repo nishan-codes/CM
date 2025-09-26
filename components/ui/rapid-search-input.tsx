@@ -138,10 +138,19 @@ export default function RapidSearchInput() {
     searchMutation.mutate(searchParams, {
       onSuccess: (data) => {
         setSearchResults(data.results);
-        toast.success(`Found ${data.results.length} new results!`);
+        if (typeof (data as any).charged === "number") {
+          toast.success(`Charged ${(data as any).charged} tokens. Found ${data.results.length} results.`);
+        } else {
+          toast.success(`Found ${data.results.length} new results!`);
+        }
       },
       onError: (error) => {
-        toast.error(`Search failed: ${error.message}`);
+        const message = (error as any)?.message || "Unknown error";
+        if (message.includes("402")) {
+          toast.error("Insufficient tokens. Buy more to continue.");
+        } else {
+          toast.error(`Search failed: ${message}`);
+        }
         setSearchResults([]);
       },
     });
